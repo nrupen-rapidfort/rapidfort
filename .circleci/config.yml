@@ -1,0 +1,15 @@
+version: 2.1
+executors:
+  rf-executor:
+    docker:
+      - image: ubuntu:latest
+jobs:
+  build:
+    environment:
+      test: 123
+    executor: rf-executor
+    steps:
+      - checkout
+      - run:
+          command: |
+            echo "This is test...."
