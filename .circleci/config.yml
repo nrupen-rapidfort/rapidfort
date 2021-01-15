@@ -90,7 +90,8 @@ jobs:
             docker ps
             curl -v http://127.0.0.1:8081/
             docker ps
-            CONTAINER_ID=docker ps  | grep "nginx:${DOCKER_TAG}-rfstub" | awk '{ print $1 }'
+            set -x
+            CONTAINER_ID=`docker ps | grep "nginx:${DOCKER_TAG}-rfstub" | awk '{ print $1 }'`
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container not found"
             else
@@ -99,6 +100,7 @@ jobs:
               sleep 10
             fi
             rfdone nginx:${DOCKER_TAG}-rfstub
+            set +x
       - run:
           name: "Harden Docker Image"
           command: |
