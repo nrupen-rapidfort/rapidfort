@@ -13,11 +13,13 @@ jobs:
       - run:
           name: "check rf cli installation"
           command: |
+            set +e
             which rflogin
             if [ $? -ne 0 ]; then
               echo "Rapidfort cli is missing...installing now..."
               pip install rapidfort==0.0.1.dev194 --extra-index-url https://pypi.rapidfort.com
             fi
+            set -e
             echo ${pwd}
             mkdir -p ~/.rapidfort
             cat > ~/.rapidfort/credentials \<< EOF
