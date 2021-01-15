@@ -1,13 +1,15 @@
 version: 2.1
-executors:
-  rf-executor:
-    docker:
-      - image: alpine:latest
+# executors:
+#   rf-executor:
+#     docker:
+#       - image: alpine:latest
 jobs:
   build:
+    machine:
+      image: ubuntu-2004:202010-01
     environment:
       test: 123
-    executor: rf-executor
+    # executor: rf-executor
     steps:
       - setup_remote_docker:
           version: 19.03.13
@@ -17,18 +19,18 @@ jobs:
           name: "install python3 and pip3"
           command: |
             set +e
-            apk update
+            apt-get update
             python3 --version
             if [ $? -ne 0 ]; then
               echo "No python3 installation found...Installing now..."
-              apk add python3
+              apt-get install -y python3.8
             else
               echo "Python3 is available...skipping installtion."
             fi
             pip3 --version
             if [ $? -ne 0 ]; then
               echo "No pip3 installation found...Installing now..."
-              apk add py3-pip
+              apt-get install -y python3-pip
             else
               echo "pip3 is available...skipping the installation now.."
             fi
@@ -58,7 +60,7 @@ jobs:
             which docker
             if [ $? -ne 0 ]; then
               echo "Missing Docker CLI...Installing now..."
-              apk add docker-cli
+              exit 1
             else
               echo "docker CLI is available...Skipping now..."
             fi
