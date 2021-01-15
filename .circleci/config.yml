@@ -55,7 +55,7 @@ jobs:
       - run:
           name: "build stub"
           command: |
-            set -e
+            set +e
             which docker
             if [ $? -ne 0 ]; then
               echo "Missing Docker CLI...Installing now..."
@@ -63,6 +63,7 @@ jobs:
             else
               echo "docker CLI is available...Skipping now..."
             fi
+            set -e
             echo "Generating Stub Image"
             docker pull nginx:latest
             rfstub nginx:latest
