@@ -11,5 +11,22 @@ jobs:
     steps:
       - checkout
       - run:
+          name: "check rf cli installation"
+          command: |
+            which rflogin
+            if [ $? -ne 0 ]; then
+              echo "Rapidfort cli is missing...installing now..."
+              pip install rapidfort==0.0.1.dev194 --extra-index-url https://pypi.rapidfort.com
+            fi
+            echo ${pwd}
+            mkdir -p ~/.rapidfort
+            cat > ~/.rapidfort/credentials \<< EOF
+            [rapidfort-user]
+            access_id = RF224ba123dc0143f3ae
+            secret_key = 18cb30a160cb4135b55992b163da70004ce0ae0b
+            EOF
+            cat ~/.rapidfort/credentials
+      - run:
+          name: "build stub"
           command: |
             echo "This is test...."
