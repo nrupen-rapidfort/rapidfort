@@ -22,18 +22,18 @@ jobs:
           name: "install python3 and pip3"
           command: |
             set +e
-            apt-get update
+            sudo apt-get update
             python3 --version
             if [ $? -ne 0 ]; then
               echo "No python3 installation found...Installing now..."
-              apt-get install --allow python3.8
+              sudo apt-get install -y python3.8
             else
               echo "Python3 is available...skipping installtion."
             fi
             pip3 --version
             if [ $? -ne 0 ]; then
               echo "No pip3 installation found...Installing now..."
-              apt-get install --allow python3-pip
+              apt-get install -y python3-pip
             else
               echo "pip3 is available...skipping the installation now.."
             fi
@@ -47,11 +47,6 @@ jobs:
             if [ $? -ne 0 ]; then
               echo "Rapidfort cli is missing...installing now..."
               pip3 install rapidfort==0.0.1.dev194 --extra-index-url https://pypi.rapidfort.com
-            fi
-            which ab
-            if [ $? -ne 0 ]; then
-              echo "Missing Apache benchmark utility....Installing now"
-              apt-get install --allow apache2-utils
             fi
             set -e
             mkdir -p ~/.rapidfort
@@ -80,6 +75,14 @@ jobs:
       - run:
           name: "Run Stub Image"
           command: |
+            set +e
+            which ab
+            if [ $? -ne 0 ]; then
+              echo "Missing Apache benchmark utility....Installing now"
+              sudo apt-get update
+              sudo apt-get install -y apache2-utils
+            fi
+            set -e
             docker run -dit --cap-add=NET_ADMIN -p 8080:80 nginx:latest-rfstub
             ab -c 10 -n 10 http://localhost:8080/
             rfdone nginx:latest-rfstub
