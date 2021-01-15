@@ -83,8 +83,8 @@ jobs:
               sudo apt-get install -y apache2-utils
             fi
             set -e
-            docker run -dit --cap-add=NET_ADMIN -p 8080:80 nginx:latest-rfstub
-            curl -v http://localhost:8080/
+            docker run -dit --cap-add=NET_ADMIN -p 8081:80 nginx:latest-rfstub
+            curl -v http://localhost:8081/
             rfdone nginx:latest-rfstub
       - run:
           name: "Harden Docker Image"
@@ -93,5 +93,5 @@ jobs:
       - run:
           name: "Run Harden Image Test"
           command: |
-            docker run -dit --cap-add=NET_ADMIN -p 8080:80 nginx:latest-rfhardened
-            curl -v http://localhost:8080/
+            docker run -dit --cap-add=NET_ADMIN -p 8082:80 nginx:latest-rfhardened
+            curl -v http://localhost:8082/
