@@ -14,6 +14,12 @@ jobs:
       RF_ACCESS_ID: "RF2a07077bf7ff4bcab1"
       RF_ACCESS_SECRET: "46562f3e493b4bf6ba1de157ed421dcd4b868055"
       DOCKER_TAG: "1.19.6"
+      SLEEP_COUNT: 10
+      DOCKER_IMAGE_NAME: "nginx:${DOCKER_TAG}"
+      STUB_DOCKER_IMAGE_NAME: "nginx:${DOCKER_TAG}-stub"
+      HARDEN_DOCKER_IMAGE_NAME: "nginx:${DOCKER_TAG}-hardened"
+      HOST_PORT: 8080
+      APP_PORT: 80
     steps:
       # - setup_remote_docker:
       #     version: 19.03.13
@@ -70,9 +76,9 @@ jobs:
             fi
             set -e
             echo "Generating Stub Image"
-            docker pull nginx:${DOCKER_TAG}
+            docker pull ${DOCKER_IMAGE_NAME}
             docker images
-            rfstub nginx:${DOCKER_TAG}
+            rfstub ${DOCKER_IMAGE_NAME}
       - run:
           name: "Run Stub Image"
           command: |
@@ -84,32 +90,57 @@ jobs:
               sudo apt-get install -y apache2-utils
             fi
             set -e
-            docker run -dit --cap-add=NET_ADMIN -p 8081:80 nginx:${DOCKER_TAG}-rfstub
+            echo "Running stub Image now..."
+            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${STUB_DOCKER_IMAGE_NAME}
+
+            echo "Waiting for ${SLEEP_COUNT} to container be in running state..."
+            sleep ${SLEEP_COUNT}
             docker ps
-            sleep 10
+
+            echo "Running test now..."
+            curl -v http://127.0.0.1:${HOST_PORT}/
             docker ps
-            curl -v http://127.0.0.1:8081/
-            docker ps
-            set -x
-            CONTAINER_ID=`docker ps | grep "nginx:${DOCKER_TAG}-rfstub" | awk '{ print $1 }'`
+            CONTAINER_ID=`docker ps | grep "${STUB_DOCKER_IMAGE_NAME}" | awk '{ print $1 }'`
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container not found"
             else
               echo "Completed testing..Stopping container now..."
               docker container stop ${CONTAINER_ID}
-              sleep 10
+              sleep ${SLEEP_COUNT}
             fi
-            rfdone nginx:${DOCKER_TAG}-rfstub
-            set +x
+            echo "Running rfdone..."
+            rfdone ${STUB_DOCKER_IMAGE_NAME}
+            if [ $? -ne 0 ]; then
+              echo "failed to complete rfdone for ${STUB_DOCKER_IMAGE_NAME}...Please check and try again..."
+              exit 1
+            else
+              echo "Completed process for running stub for ${STUB_DOCKER_IMAGE_NAME}"
+            fi
       - run:
           name: "Harden Docker Image"
           command: |
-            rfharden nginx:${DOCKER_TAG}-rfstub
+            echo "Hardening Docker image now..."
+            rfharden ${STUB_DOCKER_IMAGE_NAME}
+            if [ $? -ne 0 ]; then
+              echo "Failed to harden the docker image ${HARDEN_DOCKER_IMAGE_NAME}... Please check the error and try again..."
+              exit 1
+            else
+              echo "Docker Image hardened ${HARDEN_DOCKER_IMAGE_NAME}"
+            fi
       - run:
           name: "Run Harden Image Test"
           command: |
-            docker run -dit --cap-add=NET_ADMIN -p 8082:80 nginx:${DOCKER_TAG}-rfhardened
+            echo "Running docker image to test the resutl after hardening the docker image"
+            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${HARDEN_DOCKER_IMAGE_NAME}
+            echo "Waiting for ${SLEEP_COUNT} to container in running state."
+            sleep ${SLEEP_COUNT}
+            echo "Checking for the container state now..."
             docker ps
-            sleep 10
-            docker ps
-            curl -v http://127.0.0.1:8082/
+            CONTAINER_ID=`docker ps | grep "${HARDEN_DOCKER_IMAGE_NAME}" | awk '{ print $1 }'`
+            if [ -z ${CONTAINER_ID} ]; then
+              echo "Container is not in running state...exiting now..."
+              exit 1
+            else
+              echo "Container with ID ${CONTAINER_ID} is in running state. Running test now..."
+              curl -v http://127.0.0.1:8082/
+            fi
