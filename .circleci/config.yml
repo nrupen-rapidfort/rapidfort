@@ -62,19 +62,12 @@ jobs:
             else
               echo "docker CLI is available...Skipping now..."
             fi
-            if [ ! -f ~/.rapidfort/credentials ]; then
-              echo "File does not exists."
-              mkdir -p ~/.rapidfort
-              cat > ~/.rapidfort/credentials \<< EOF
-              [rapidfort-user]
-              access_id = RF224ba123dc0143f3ae
-              secret_key = 18cb30a160cb4135b55992b163da70004ce0ae0b
-              EOF
-              cat ~/.rapidfort/credentials
-            else
-              echo "Rapidfort credentials exists...skipping now..."
-              rfconfigure
-            fi
+            cat > ~/.rapidfort/credentials \<< EOF
+            [rapidfort-user]
+            access_id = RF224ba123dc0143f3ae
+            secret_key = 18cb30a160cb4135b55992b163da70004ce0ae0b
+            EOF
+            cat ~/.rapidfort/credentials
             set -ex
             echo "Generating Stub Image"
             docker pull nginx:latest
