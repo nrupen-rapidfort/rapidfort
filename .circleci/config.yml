@@ -90,7 +90,7 @@ jobs:
             fi
             set -e
             echo "Running stub Image now..."
-            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub
+            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub
 
             echo "Waiting for ${SLEEP_COUNT} to container be in running state..."
             sleep ${SLEEP_COUNT}
@@ -99,7 +99,7 @@ jobs:
             echo "Running test now..."
             curl -v http://127.0.0.1:${HOST_PORT}/
             docker ps
-            CONTAINER_ID=`docker ps | grep "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub" | awk '{ print $1 }'`
+            CONTAINER_ID=`docker ps | grep "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub" | awk '{ print $1 }'`
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container not found"
             else
@@ -108,18 +108,18 @@ jobs:
               sleep ${SLEEP_COUNT}
             fi
             echo "Running rfdone..."
-            rfdone ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub
+            rfdone ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub
             if [ $? -ne 0 ]; then
-              echo "failed to complete rfdone for ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub...Please check and try again..."
+              echo "failed to complete rfdone for ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub...Please check and try again..."
               exit 1
             else
-              echo "Completed process for running stub for ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub"
+              echo "Completed process for running stub for ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub"
             fi
       - run:
           name: "Harden Docker Image"
           command: |
             echo "Hardening Docker image now..."
-            rfharden ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub
+            rfharden ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub
             if [ $? -ne 0 ]; then
               echo "Failed to harden the docker image ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened... Please check the error and try again..."
               exit 1
