@@ -26,14 +26,14 @@ jobs:
             python3 --version
             if [ $? -ne 0 ]; then
               echo "No python3 installation found...Installing now..."
-              apt-get install -y python3.8
+              apt-get install --allow python3.8
             else
               echo "Python3 is available...skipping installtion."
             fi
             pip3 --version
             if [ $? -ne 0 ]; then
               echo "No pip3 installation found...Installing now..."
-              apt-get install -y python3-pip
+              apt-get install --allow python3-pip
             else
               echo "pip3 is available...skipping the installation now.."
             fi
@@ -51,7 +51,7 @@ jobs:
             which ab
             if [ $? -ne 0 ]; then
               echo "Missing Apache benchmark utility....Installing now"
-              apt-get install -y apache2-utils
+              apt-get install --allow apache2-utils
             fi
             set -e
             mkdir -p ~/.rapidfort
