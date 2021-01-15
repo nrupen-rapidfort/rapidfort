@@ -15,9 +15,7 @@ jobs:
       RF_ACCESS_SECRET: "46562f3e493b4bf6ba1de157ed421dcd4b868055"
       DOCKER_TAG: "1.19.6"
       SLEEP_COUNT: 10
-      DOCKER_IMAGE_NAME: "nginx:${DOCKER_TAG}"
-      STUB_DOCKER_IMAGE_NAME: "nginx:${DOCKER_TAG}-stub"
-      HARDEN_DOCKER_IMAGE_NAME: "nginx:${DOCKER_TAG}-hardened"
+      DOCKER_IMAGE_NAME: "nginx"
       HOST_PORT: 8080
       APP_PORT: 80
     steps:
@@ -77,9 +75,9 @@ jobs:
             set -e
             set -x
             echo "Generating Stub Image"
-            docker pull ${DOCKER_IMAGE_NAME}
+            docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
             docker images
-            rfstub ${DOCKER_IMAGE_NAME}
+            rfstub ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
       - run:
           name: "Run Stub Image"
           command: |
@@ -92,7 +90,7 @@ jobs:
             fi
             set -e
             echo "Running stub Image now..."
-            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${STUB_DOCKER_IMAGE_NAME}
+            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub
 
             echo "Waiting for ${SLEEP_COUNT} to container be in running state..."
             sleep ${SLEEP_COUNT}
@@ -101,7 +99,7 @@ jobs:
             echo "Running test now..."
             curl -v http://127.0.0.1:${HOST_PORT}/
             docker ps
-            CONTAINER_ID=`docker ps | grep "${STUB_DOCKER_IMAGE_NAME}" | awk '{ print $1 }'`
+            CONTAINER_ID=`docker ps | grep "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub" | awk '{ print $1 }'`
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container not found"
             else
@@ -110,34 +108,34 @@ jobs:
               sleep ${SLEEP_COUNT}
             fi
             echo "Running rfdone..."
-            rfdone ${STUB_DOCKER_IMAGE_NAME}
+            rfdone ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub
             if [ $? -ne 0 ]; then
-              echo "failed to complete rfdone for ${STUB_DOCKER_IMAGE_NAME}...Please check and try again..."
+              echo "failed to complete rfdone for ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub...Please check and try again..."
               exit 1
             else
-              echo "Completed process for running stub for ${STUB_DOCKER_IMAGE_NAME}"
+              echo "Completed process for running stub for ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub"
             fi
       - run:
           name: "Harden Docker Image"
           command: |
             echo "Hardening Docker image now..."
-            rfharden ${STUB_DOCKER_IMAGE_NAME}
+            rfharden ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-stub
             if [ $? -ne 0 ]; then
-              echo "Failed to harden the docker image ${HARDEN_DOCKER_IMAGE_NAME}... Please check the error and try again..."
+              echo "Failed to harden the docker image ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened... Please check the error and try again..."
               exit 1
             else
-              echo "Docker Image hardened ${HARDEN_DOCKER_IMAGE_NAME}"
+              echo "Docker Image hardened ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened"
             fi
       - run:
           name: "Run Harden Image Test"
           command: |
             echo "Running docker image to test the resutl after hardening the docker image"
-            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${HARDEN_DOCKER_IMAGE_NAME}
+            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened
             echo "Waiting for ${SLEEP_COUNT} to container in running state."
             sleep ${SLEEP_COUNT}
             echo "Checking for the container state now..."
             docker ps
-            CONTAINER_ID=`docker ps | grep "${HARDEN_DOCKER_IMAGE_NAME}" | awk '{ print $1 }'`
+            CONTAINER_ID=`docker ps | grep "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened" | awk '{ print $1 }'`
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container is not in running state...exiting now..."
               exit 1
