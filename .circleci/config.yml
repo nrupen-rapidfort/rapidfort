@@ -75,6 +75,7 @@ jobs:
               echo "docker CLI is available...Skipping now..."
             fi
             set -e
+            set -x
             echo "Generating Stub Image"
             docker pull ${DOCKER_IMAGE_NAME}
             docker images
