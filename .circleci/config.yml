@@ -18,14 +18,14 @@ jobs:
             python3 --version
             if [ $? -ne 0 ]; then
               echo "No python3 installation found...Installing now..."
-              apt install python3.8
+              apt install python3.8 -y
             else
               echo "Python3 is available...skipping installtion."
             fi
             pip3 --version
             if [ $? -ne 0 ]; then
               echo "No pip3 installation found...Installing now..."
-              apt install python3-pip
+              apt install python3-pip -y
             else
               echo "pip3 is available...skipping the installation now.."
             fi
