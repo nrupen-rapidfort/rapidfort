@@ -2,7 +2,7 @@ version: 2.1
 executors:
   rf-executor:
     docker:
-      - image: ubuntu:latest
+      - image: alpine:latest
 jobs:
   build:
     environment:
@@ -17,18 +17,18 @@ jobs:
           name: "install python3 and pip3"
           command: |
             set +e
-            apt update
+            apk update
             python3 --version
             if [ $? -ne 0 ]; then
               echo "No python3 installation found...Installing now..."
-              apt install python3.8 -y
+              apk add python3
             else
               echo "Python3 is available...skipping installtion."
             fi
             pip3 --version
             if [ $? -ne 0 ]; then
               echo "No pip3 installation found...Installing now..."
-              apt install python3-pip -y
+              apk add py3-pip
             else
               echo "pip3 is available...skipping the installation now.."
             fi
@@ -55,6 +55,14 @@ jobs:
       - run:
           name: "build stub"
           command: |
+            set -e
+            which docker
+            if [ $? -ne 0 ]; then
+              echo "Missing Docker CLI...Installing now..."
+              apk add docker-cli
+            else
+              echo "docker CLI is available...Skipping now..."
+            fi
             echo "Generating Stub Image"
             docker pull nginx:latest
             rfstub nginx:latest
