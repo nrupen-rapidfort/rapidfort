@@ -73,4 +73,5 @@ jobs:
             set -ex
             echo "Generating Stub Image"
             docker pull nginx:latest
+            docker images
             rfstub nginx:latest
