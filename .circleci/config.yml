@@ -121,21 +121,21 @@ jobs:
             echo "Hardening Docker image now..."
             rfharden ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub
             if [ $? -ne 0 ]; then
-              echo "Failed to harden the docker image ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened... Please check the error and try again..."
+              echo "Failed to harden the docker image ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfhardened... Please check the error and try again..."
               exit 1
             else
-              echo "Docker Image hardened ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened"
+              echo "Docker Image hardened ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfhardened"
             fi
       - run:
           name: "Run Harden Image Test"
           command: |
             echo "Running docker image to test the resutl after hardening the docker image"
-            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened
+            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfhardened
             echo "Waiting for ${SLEEP_COUNT} to container in running state."
             sleep ${SLEEP_COUNT}
             echo "Checking for the container state now..."
             docker ps
-            CONTAINER_ID=`docker ps | grep "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-hardened" | awk '{ print $1 }'`
+            CONTAINER_ID=`docker ps | grep "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfhardened" | awk '{ print $1 }'`
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container is not in running state...exiting now..."
               exit 1
