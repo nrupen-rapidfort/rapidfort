@@ -54,7 +54,7 @@ jobs:
       - run:
           name: "build stub"
           command: |
-            set +e
+            set +ex
             which docker
             if [ $? -ne 0 ]; then
               echo "Missing Docker CLI...Installing now..."
@@ -75,7 +75,7 @@ jobs:
               echo "Rapidfort credentials exists...skipping now..."
               rfconfigure
             fi
-            set -e
+            set -ex
             echo "Generating Stub Image"
             docker pull nginx:latest
             rfstub nginx:latest
