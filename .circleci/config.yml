@@ -52,4 +52,6 @@ jobs:
       - run:
           name: "build stub"
           command: |
-            echo "This is test...."
+            echo "Generating Stub Image"
+            docker pull nginx:latest
+            rfstub nginx:latest
