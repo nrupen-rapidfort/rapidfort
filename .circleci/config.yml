@@ -141,5 +141,9 @@ jobs:
               exit 1
             else
               echo "Container with ID ${CONTAINER_ID} is in running state. Running test now..."
-              curl -v http://127.0.0.1:8082/
+              curl -v http://127.0.0.1:${HOST_PORT}/
+              if [ $? -ne 0 ]; then
+                echo "Test failed..."
+              else
+                echo "Test passed...Docker image is ready to push to artifactory..."
             fi
