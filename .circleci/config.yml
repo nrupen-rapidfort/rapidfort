@@ -85,6 +85,8 @@ jobs:
             set -e
             docker run -dit --cap-add=NET_ADMIN -p 8081:80 nginx:latest-rfstub
             docker ps
+            sleep 10
+            docker ps
             curl -v http://127.0.0.1:8081/
             rfdone nginx:latest-rfstub
       - run:
@@ -95,4 +97,7 @@ jobs:
           name: "Run Harden Image Test"
           command: |
             docker run -dit --cap-add=NET_ADMIN -p 8082:80 nginx:latest-rfhardened
+            docker ps
+            sleep 10
+            docker ps
             curl -v http://127.0.0.1:8082/
