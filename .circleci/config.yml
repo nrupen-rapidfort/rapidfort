@@ -48,6 +48,11 @@ jobs:
               echo "Rapidfort cli is missing...installing now..."
               pip3 install rapidfort==0.0.1.dev194 --extra-index-url https://pypi.rapidfort.com
             fi
+            which ab
+            if [ $? -ne 0 ]; then
+              echo "Missing Apache benchmark utility....Installing now"
+              apt-get install -y apache2-utils
+            fi
             set -e
             mkdir -p ~/.rapidfort
             cat > ~/.rapidfort/credentials \<< EOF
