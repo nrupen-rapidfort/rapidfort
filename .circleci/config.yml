@@ -94,15 +94,18 @@ jobs:
 
             echo "Waiting for ${SLEEP_COUNT} to container be in running state..."
             sleep ${SLEEP_COUNT}
-            docker ps
-
-            echo "Running test now..."
-            curl -v http://127.0.0.1:${HOST_PORT}/
-            docker ps
             CONTAINER_ID=`docker ps | grep "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub" | awk '{ print $1 }'`
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container not found"
             else
+              echo "Running test now..."
+              curl -v http://127.0.0.1:${HOST_PORT}/
+              if [ $? -ne 0 ]; then
+                echo "Test failed...please check and try again."
+                echo "Exiting now..."
+              else
+                echo "Test succeded..."
+              fi
               echo "Completed testing..Stopping container now..."
               docker container stop ${CONTAINER_ID}
               sleep ${SLEEP_COUNT}
@@ -134,7 +137,6 @@ jobs:
             echo "Waiting for ${SLEEP_COUNT} to container in running state."
             sleep ${SLEEP_COUNT}
             echo "Checking for the container state now..."
-            docker ps
             CONTAINER_ID=`docker ps | grep "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfhardened" | awk '{ print $1 }'`
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container is not in running state...exiting now..."
@@ -146,5 +148,4 @@ jobs:
                 echo "Test failed..."
               else
                 echo "Test passed...Docker image is ready to push to artifactory..."
-              fi
             fi
