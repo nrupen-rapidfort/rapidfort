@@ -146,4 +146,5 @@ jobs:
                 echo "Test failed..."
               else
                 echo "Test passed...Docker image is ready to push to artifactory..."
+              fi
             fi
