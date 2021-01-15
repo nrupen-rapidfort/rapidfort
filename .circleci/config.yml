@@ -72,7 +72,7 @@ jobs:
             echo "Generating Stub Image"
             docker pull nginx:${DOCKER_TAG}
             docker images
-            rfstub nginx:latest
+            rfstub nginx:${DOCKER_TAG}
       - run:
           name: "Run Stub Image"
           command: |
