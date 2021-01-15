@@ -8,8 +8,11 @@ jobs:
     machine:
       image: ubuntu-2004:202010-01
     environment:
-      test: 123
-    # executor: rf-executor
+      API_ROOT_URL: "https://api.rapidfort.com"
+      AUTH_SERVER_BASE_URL: "https://auth.rapidfort.com"
+      RF_API_SERVER: "https://api.rapidfort.com"
+      RF_ACCESS_ID: "RF2a07077bf7ff4bcab1"
+      RF_ACCESS_SECRET: "46562f3e493b4bf6ba1de157ed421dcd4b868055"
     steps:
       # - setup_remote_docker:
       #     version: 19.03.13
@@ -37,7 +40,7 @@ jobs:
             set -e
 
       - run:
-          name: "check rf cli installation"
+          name: "Setup Rapidfort Environment"
           command: |
             set +e
             which rflogin
@@ -49,14 +52,14 @@ jobs:
             mkdir -p ~/.rapidfort
             cat > ~/.rapidfort/credentials \<< EOF
             [rapidfort-user]
-            access_id = RF2a07077bf7ff4bcab1
-            secret_key = 46562f3e493b4bf6ba1de157ed421dcd4b868055
+            access_id = ${RF_ACCESS_ID}
+            secret_key = ${RF_ACCESS_SECRET}
             EOF
             cat ~/.rapidfort/credentials
       - run:
           name: "build stub"
           command: |
-            set +ex
+            set +e
             which docker
             if [ $? -ne 0 ]; then
               echo "Missing Docker CLI...Installing now..."
@@ -64,16 +67,23 @@ jobs:
             else
               echo "docker CLI is available...Skipping now..."
             fi
-            cat ~/.rapidfort/credentials
-            echo "------------------------------"
-            cat > ~/.rapidfort/credentials \<< EOF
-            [rapidfort-user]
-            access_id = RF2a07077bf7ff4bcab1
-            secret_key = 46562f3e493b4bf6ba1de157ed421dcd4b868055
-            EOF
-            cat ~/.rapidfort/credentials
-            set -ex
+            set -e
             echo "Generating Stub Image"
             docker pull nginx:latest
             docker images
             rfstub nginx:latest
+      - run:
+          name: "Run Stub Image"
+          command: |
+            docker run -dit --cap-add=NET_ADMIN -p 8080:80 nginx:latest-rfstub
+            ab -c 10 -n 10 http://localhost:8080/
+            rfdone nginx:latest-rfstub
+      - run:
+          name: "Harden Docker Image"
+          command: |
+            rfharden nginx:latest-rfstub
+      - run:
+          name: "Run Harden Image Test"
+          command: |
+            docker run -dit --cap-add=NET_ADMIN -p 8080:80 nginx:latest-rfhardened
+            ab -c 10 -n 10 http://localhost:8080/
