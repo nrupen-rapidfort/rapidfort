@@ -13,6 +13,7 @@ jobs:
       RF_API_SERVER: "https://api.rapidfort.com"
       RF_ACCESS_ID: "RF2a07077bf7ff4bcab1"
       RF_ACCESS_SECRET: "46562f3e493b4bf6ba1de157ed421dcd4b868055"
+      DOCKER_TAG: "1.19.6"
     steps:
       # - setup_remote_docker:
       #     version: 19.03.13
@@ -69,7 +70,7 @@ jobs:
             fi
             set -e
             echo "Generating Stub Image"
-            docker pull nginx:latest
+            docker pull nginx:${DOCKER_TAG}
             docker images
             rfstub nginx:latest
       - run:
@@ -83,20 +84,20 @@ jobs:
               sudo apt-get install -y apache2-utils
             fi
             set -e
-            docker run -dit --cap-add=NET_ADMIN -p 8081:80 nginx:latest-rfstub
+            docker run -dit --cap-add=NET_ADMIN -p 8081:80 nginx:${DOCKER_TAG}-rfstub
             docker ps
             sleep 10
             docker ps
             curl -v http://127.0.0.1:8081/
-            rfdone nginx:latest-rfstub
+            rfdone nginx:${DOCKER_TAG}-rfstub
       - run:
           name: "Harden Docker Image"
           command: |
-            rfharden nginx:latest-rfstub
+            rfharden nginx:${DOCKER_TAG}-rfstub
       - run:
           name: "Run Harden Image Test"
           command: |
-            docker run -dit --cap-add=NET_ADMIN -p 8082:80 nginx:latest-rfhardened
+            docker run -dit --cap-add=NET_ADMIN -p 8082:80 nginx:${DOCKER_TAG}-rfhardened
             docker ps
             sleep 10
             docker ps
