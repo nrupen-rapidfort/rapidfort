@@ -11,8 +11,6 @@ jobs:
       API_ROOT_URL: "https://api.rapidfort.com"
       AUTH_SERVER_BASE_URL: "https://auth.rapidfort.com"
       RF_API_SERVER: "https://api.rapidfort.com"
-      RF_ACCESS_ID: "RF2a07077bf7ff4bcab1"
-      RF_ACCESS_SECRET: "46562f3e493b4bf6ba1de157ed421dcd4b868055"
       DOCKER_TAG: "1.19.6"
       SLEEP_COUNT: 10
       DOCKER_IMAGE_NAME: "nginx"
