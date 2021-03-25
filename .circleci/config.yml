@@ -98,6 +98,7 @@ jobs:
             else
               echo "sleeping for 20 seconds"
               sleep 20
+              docker logs ${CONTAINER_ID}
               echo "Running test now..."
               curl -v http://127.0.0.1:${HOST_PORT}/
               if [ $? -ne 0 ]; then
