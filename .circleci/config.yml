@@ -12,7 +12,7 @@ jobs:
       AUTH_SERVER_BASE_URL: "https://auth.rapidfort.com"
       RF_API_SERVER: "https://api.rapidfort.com"
       DOCKER_TAG: "1.19.6"
-      SLEEP_COUNT: 240 
+      SLEEP_COUNT: 60 
       DOCKER_IMAGE_NAME: "nginx"
       HOST_PORT: 8080
       APP_PORT: 80
