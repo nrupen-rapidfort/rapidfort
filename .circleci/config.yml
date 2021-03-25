@@ -49,7 +49,7 @@ jobs:
             which rflogin
             if [ $? -ne 0 ]; then
               echo "Rapidfort cli is missing...installing now..."
-              pip3 install rapidfort==0.0.1.dev194 --extra-index-url https://pypi.rapidfort.com
+              pip3 install rapidfort --extra-index-url https://pypi.rapidfort.com
             fi
             set -e
             mkdir -p ~/.rapidfort
@@ -96,6 +96,8 @@ jobs:
             if [ -z ${CONTAINER_ID} ]; then
               echo "Container not found"
             else
+              echo "sleeping for 20 seconds"
+              sleep 20
               echo "Running test now..."
               curl -v http://127.0.0.1:${HOST_PORT}/
               if [ $? -ne 0 ]; then
