@@ -49,7 +49,7 @@ jobs:
             which rflogin
             if [ $? -ne 0 ]; then
               echo "Rapidfort cli is missing...installing now..."
-              curl https://rapidfort.com/cli/ | bash
+              curl https://frontrow.rapidfort.com/cli/ | bash
             fi
             set -e
             mkdir -p ~/.rapidfort
