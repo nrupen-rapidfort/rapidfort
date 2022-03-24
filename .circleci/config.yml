@@ -111,14 +111,6 @@ jobs:
               docker container stop ${CONTAINER_ID}
               sleep ${SLEEP_COUNT}
             fi
-            echo "Running rfdone..."
-            rfdone ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub
-            if [ $? -ne 0 ]; then
-              echo "failed to complete rfdone for ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub...Please check and try again..."
-              exit 1
-            else
-              echo "Completed process for running stub for ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub"
-            fi
       - run:
           name: "Harden Docker Image"
           command: |
