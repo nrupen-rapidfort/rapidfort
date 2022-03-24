@@ -88,7 +88,7 @@ jobs:
             fi
             set -e
             echo "Running stub Image now..."
-            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub
+            docker run -dit --cap-add=SYS_PTRACE -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfstub
 
             echo "Waiting for ${SLEEP_COUNT} to container be in running state..."
             sleep ${SLEEP_COUNT}
@@ -134,7 +134,7 @@ jobs:
           name: "Run Harden Image Test"
           command: |
             echo "Running docker image to test the resutl after hardening the docker image"
-            docker run -dit --cap-add=NET_ADMIN -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfhardened
+            docker run -dit -p ${HOST_PORT}:${APP_PORT} ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}-rfhardened
             echo "Waiting for ${SLEEP_COUNT} to container in running state."
             sleep ${SLEEP_COUNT}
             echo "Checking for the container state now..."
